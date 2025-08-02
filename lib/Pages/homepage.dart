@@ -116,18 +116,7 @@ class _HomepageState extends State<Homepage> {
                 ),
               ),
 
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
 
-                      ],
-                    ),
-                  ],
-                ),
-              )
             ],
           )
 
