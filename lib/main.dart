@@ -14,6 +14,9 @@ class MyApp extends StatelessWidget {
       home: Homepage(),
       debugShowCheckedModeBanner: false,
       title: "Rahbaar",
+      theme: ThemeData(
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
     );
   }
 }

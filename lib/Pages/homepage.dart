@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rahbar_revised/Pages/allAlumniPage.dart';
 import 'package:rahbar_revised/Pages/currentStudentPage.dart';
+
+import '../Data/card_data.dart';
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
 
@@ -127,11 +129,65 @@ class _HomepageState extends State<Homepage> {
                     ),
                   ],
                 ),
-              )
+              ),
+
+              Expanded(
+                child: GridView.builder(
+                  padding: const EdgeInsets.all(10.0),
+                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 250.0,
+                    mainAxisSpacing: 10.0,
+                    crossAxisSpacing: 10.0,
+                    childAspectRatio: 3 / 2,
+                  ),
+
+                  itemCount: cardItems.length,
+                  // The itemBuilder function is called for each item in the grid
+                  itemBuilder: (context, index) {
+                    // HERE IT IS!
+                    // 'item' is created to hold one object from the cardItems list.
+                    final item = cardItems[index];
+
+                    // Now we use the 'item' to build the Card widget
+                    return Card(
+                      semanticContainer: true,
+                      borderOnForeground: true,
+                      elevation: 10,
+                      color: Colors.white,
+                      child: InkWell(
+                        onTap: () {
+                          print('${item.title} tapped!');
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(
+                              item.icon, // Using item's data
+                              size: 40,
+                              color: item.color, // Using item's data
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              item.title, // Using item's data
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              item.subtitle, // Using item's data
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
             ],
-          )
-
-
+          ),
     );
   }
 }
