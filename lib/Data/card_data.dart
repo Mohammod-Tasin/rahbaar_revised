@@ -48,5 +48,10 @@ const List<CardItem> cardItems = [
       subtitle: "Connect with mentors",
       icon: Icons.school,
       color: Colors.black),
+  CardItem(
+      title: "Contact with developer",
+      subtitle: "Any suggestions or queries are welcome",
+      icon: Icons.comment_rounded,
+      color: Colors.black),
 
 ];

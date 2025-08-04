@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rahbar_revised/Pages/allAlumniPage.dart';
 import 'package:rahbar_revised/Pages/currentStudentPage.dart';
 import '../Data/card_data.dart';
+import 'contactWithDeveloperPage.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -42,7 +43,11 @@ class _HomepageState extends State<Homepage> {
         backgroundColor: Colors.white,
         title: Row(
           mainAxisSize: MainAxisSize.min,
-          children: [Icon(Icons.beach_access_rounded), Text("Rahbaar")],
+          children: [Icon(Icons.beach_access_rounded),
+            Text(
+              "Rahbaar",
+              style: GoogleFonts.ubuntu(),
+          )],
         ),
         centerTitle: true,
       ),
@@ -139,11 +144,11 @@ class _HomepageState extends State<Homepage> {
               Expanded(
                 child: GridView.builder(
                   padding: const EdgeInsets.all(10.0),
-                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 280.0,
-                    mainAxisSpacing: 15.0,
-                    crossAxisSpacing: 12.0,
-                    childAspectRatio: 5/4.5,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                    mainAxisSpacing: 10.0,
+                    crossAxisSpacing: 10.0,
+                    childAspectRatio: 3/2,
                   ),
 
                   itemCount: cardItems.length,
@@ -154,37 +159,58 @@ class _HomepageState extends State<Homepage> {
                     final item = cardItems[index];
 
                     // Now we use the 'item' to build the Card widget
-                    return Card(
-                      semanticContainer: true,
-                      borderOnForeground: true,
-                      elevation: 10,
-                      color: Colors.white,
-                      child: InkWell(
-                        onTap: () {
-                          print('${item.title} tapped!');
-                        },
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Icon(
-                              item.icon, // Using item's data
-                              size: 40,
-                              color: item.color, // Using item's data
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              item.title, // Using item's data
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              item.subtitle, // Using item's data
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ],
+                    return InkWell(
+                      onTap: (){
+                        if(item.title== "Alumni page") {
+                          Navigator.push(
+                            context, MaterialPageRoute(
+                              builder: (context) => Allalumnipage()),
+                          );
+                        }else if(item.title=="Current Student Page"){
+                          Navigator.push(
+                            context, MaterialPageRoute(
+                              builder: (context) => Currentstudentpage()),
+                          );
+                        }
+                        else if(item.title=="Contact with developer"){
+                          Navigator.push(
+                              context, MaterialPageRoute(
+                              builder: (context)=> Contactwithdeveloperpage()));
+                        }
+                        // আপনি চাইলে অন্যান্য কার্ডের জন্যও একই রকম ভাবে পেজ যোগ করতে পারেন
+                      },
+                      child: Card(
+                        semanticContainer: true,
+                        borderOnForeground: true,
+                        elevation: 10,
+                        color: Colors.white,
+                        child: InkWell(
+                          onTap: () {
+                            print('${item.title} tapped!');
+                          },
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Icon(
+                                item.icon, // Using item's data
+                                size: 40,
+                                color: item.color, // Using item's data
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                item.title, // Using item's data
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                item.subtitle, // Using item's data
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );

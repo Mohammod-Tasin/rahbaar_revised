@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rahbar_revised/Pages/alumniDetailsPage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 
@@ -19,15 +20,17 @@ class _AllalumnipageState extends State<Allalumnipage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Alumni Page"),
+        title: Text("Alumni Page",
+        style: GoogleFonts.ubuntu(),
+        ),
         backgroundColor: Colors.white,
       ),
       backgroundColor: Colors.white,
       body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: _alumniFuture, 
+        future: _alumniFuture,
         builder: (context,  snapshot) {
           // যদি ডেটা লোড হতে থাকে, একটি লোডিং সিম্বল দেখান
-          if(snapshot.connectionState ==ConnectionState.waiting){
+          if(snapshot.connectionState==ConnectionState.waiting){
             return const Center(child: CircularProgressIndicator());
           }
           // যদি কোনো এরর হয়, এরর মেসেজ দেখান
@@ -63,20 +66,28 @@ class _AllalumnipageState extends State<Allalumnipage> {
             final alumniDept = alumni['Department'] ?? 'N/A';
                 return Card(
                   margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  elevation: 3,
+                  color: Colors.white,
+                  elevation: 5,
                   child: ListTile(
                     title: Text(
                       alumniName,
                       style: GoogleFonts.ubuntu(fontWeight: FontWeight.bold),
                     ),
-                    subtitle: Text('Series: $alumniSeries - Dept: $alumniDept'),
+                    subtitle: Text("$alumniDept'$alumniSeries"),
                     leading: CircleAvatar(
-                      backgroundColor: Colors.teal,
+                      backgroundColor: Colors.black12,
                       child: Text(
                         alumniName.isNotEmpty ? alumniName[0].toUpperCase() : 'A',
                         style: TextStyle(color: Colors.white),
                     ),
                   ),
+                    onTap: (){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context)=> Alumnidetailspage(alumnus: alumni),
+                        ),
+                      );
+                    },
                   ),
                 );
               }
