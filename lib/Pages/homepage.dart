@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rahbar_revised/Pages/allAlumniPage.dart';
 import 'package:rahbar_revised/Pages/currentStudentPage.dart';
-
 import '../Data/card_data.dart';
+
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
-
   @override
   State<Homepage> createState() => _HomepageState();
 }
@@ -54,13 +53,19 @@ class _HomepageState extends State<Homepage> {
             children: [
               DrawerHeader(
                 child: Center(
-                  child: Text("L O G O", style: TextStyle(fontSize: 35)),
+                  child: Text("R A H B A A R", style: TextStyle(fontSize: 35)),
                 ),
               ),
 
               ListTile(
-                leading: Icon(Icons.home),
-                title: Text("Alumni Page", style: TextStyle(fontSize: 20)),
+                leading: Icon(Icons.school_rounded),
+                title: Row(
+                  children: [
+                    Text("Alumni", style: GoogleFonts.ubuntu(
+                      fontSize: 25,
+                    )),
+                  ],
+                ),
                 onTap: () {
                   // First, close the drawer
                   Navigator.pop(context);
@@ -75,7 +80,7 @@ class _HomepageState extends State<Homepage> {
               ),
 
               ListTile(
-                leading: Icon(Icons.cabin),
+                leading: Icon(Icons.people_rounded),
                 title: Text("Current Students", style: TextStyle(fontSize: 20)),
                 onTap: () {
                   // First, close the drawer
@@ -135,10 +140,10 @@ class _HomepageState extends State<Homepage> {
                 child: GridView.builder(
                   padding: const EdgeInsets.all(10.0),
                   gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 250.0,
-                    mainAxisSpacing: 10.0,
-                    crossAxisSpacing: 10.0,
-                    childAspectRatio: 3 / 2,
+                    maxCrossAxisExtent: 280.0,
+                    mainAxisSpacing: 15.0,
+                    crossAxisSpacing: 12.0,
+                    childAspectRatio: 5/4.5,
                   ),
 
                   itemCount: cardItems.length,

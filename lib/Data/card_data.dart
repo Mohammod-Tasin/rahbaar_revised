@@ -19,34 +19,34 @@ class CardItem {
 // By keeping it in a separate file, your UI code stays clean.
 const List<CardItem> cardItems = [
   CardItem(
-      title: "Alumni Directory",
-      subtitle: "Find old friends",
-      icon: Icons.search,
-      color: Colors.orange),
+      title: "Alumni page",
+      subtitle: "Get Info of Alumni's connected to Tabligh",
+      icon: Icons.school_rounded,
+      color: Colors.black),
   CardItem(
-      title: "Events",
-      subtitle: "Upcoming gatherings",
-      icon: Icons.event,
-      color: Colors.blue),
+      title: "Current Student Page",
+      subtitle: "Get Info of current students connected to Tabligh",
+      icon: Icons.people_rounded,
+      color: Colors.black),
   CardItem(
       title: "Job Board",
       subtitle: "New opportunities",
       icon: Icons.work,
-      color: Colors.green),
+      color: Colors.black),
   CardItem(
       title: "News",
       subtitle: "Latest updates",
       icon: Icons.article,
-      color: Colors.purple),
+      color: Colors.black),
   CardItem(
       title: "Gallery",
       subtitle: "Event photos",
       icon: Icons.photo_album,
-      color: Colors.pink),
+      color: Colors.black),
   CardItem(
       title: "Mentorship",
       subtitle: "Connect with mentors",
       icon: Icons.school,
-      color: Colors.teal),
+      color: Colors.black),
 
 ];
