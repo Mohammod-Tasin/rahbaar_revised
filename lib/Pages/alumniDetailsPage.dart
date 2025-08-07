@@ -1,85 +1,140 @@
-// lib/Pages/alumni_detail_page.dart
+// lib/Pages/alumniDetailsPage.dart
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Alumnidetailspage extends StatelessWidget {
   final Map<String, dynamic> alumnus;
 
   const Alumnidetailspage({super.key, required this.alumnus});
 
-  // তথ্যের প্রতিটি সারি (row) তৈরির জন্য helper widget
+  // ===== নতুন ফাংশন যোগ করা হয়েছে =====
+  // ইমেইল অ্যাপ চালু করার ফাংশন
+  Future<void> _launchEmail(String email, BuildContext context) async {
+    if (email.isEmpty || email == 'N/A') return;
+
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: email,
+      query: 'subject=Connecting from Rahbaar App',
+    );
+
+    if (await canLaunchUrl(emailUri)) {
+      await launchUrl(emailUri);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not open email app for $email')),
+      );
+    }
+  }
+
+  // ফোন ডায়ালার চালু করার ফাংশন
+  Future<void> _launchPhone(String phoneNumber, BuildContext context) async {
+    if (phoneNumber.isEmpty || phoneNumber == 'N/A' || phoneNumber == 'Not Available') return;
+
+    final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
+
+    if (await canLaunchUrl(phoneUri)) {
+      await launchUrl(phoneUri);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not open phone app for $phoneNumber')),
+      );
+    }
+  }
+
+
+  // ===== _buildInfoRow উইজেটটি আপডেট করা হয়েছে =====
   Widget _buildInfoRow({
     required IconData icon,
     required String title,
     required String value,
+    VoidCallback? onTap,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 20, color: Colors.black54),
-          const SizedBox(width: 20),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 4),
-                Text(value, style: TextStyle(color: Colors.grey[700])),
-              ],
+    final bool isClickable = onTap != null;
+
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, size: 20, color: Colors.black54),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    value,
+                    style: TextStyle(
+                      color: isClickable ? Colors.blue[800] : Colors.grey[700],
+                      decoration: isClickable ? TextDecoration.underline : TextDecoration.none,
+                      decorationColor: Colors.blue[800],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  // ===== Career সেকশনের ডিজাইনটি এখানে পরিবর্তন করা হয়েছে =====
+  // Career সেকশনের কোড (আপনার কোড অনুযায়ী)
   Widget _buildCareerTile(Map<String, dynamic> job, {required bool isLast}) {
     final bool isPresent = job['is_present'] ?? false;
-    return IntrinsicHeight( // দুটি কলামের উচ্চতা সমান রাখার জন্য
+    return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // বাম দিকের আইকন ও লাইন
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              // টাইমলাইনের ডট
-              isPresent
-                  ? Icon(Icons.check_circle, color: Colors.green, size: 20)
-              : Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(
-                  color: Colors.teal,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              // শেষ আইটেম না হলে নিচে ভার্টিকাল লাইন আঁকা হবে
-              if (!isLast)
-                Expanded(
-                  child: Container(
-                    width: 2,
-                    color: Colors.teal.withOpacity(0.5),
+          SizedBox(
+            width: 30,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                isPresent
+                    ? Icon(Icons.check_circle, color: Colors.green, size: 20)
+                    : Container(
+                        width: 12,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: Colors.black12,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                if (!isLast)
+                  Expanded(
+                    child: Container(
+                      width: 2,
+                      color: Colors.teal.withOpacity(0.5),
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
-          const SizedBox(width: 20),
-          // ডান দিকের টেক্সট
+          const SizedBox(width: 12),
           Expanded(
             child: Padding(
-              // প্রতিটি আইটেমের নিচে একটু ফাঁকা জায়গা
               padding: const EdgeInsets.only(bottom: 24.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     job['position'] ?? 'N/A',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: isPresent ? Colors.green[800] : Colors.black,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -95,7 +150,6 @@ class Alumnidetailspage extends StatelessWidget {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     // ডেটাবেজ থেকে তথ্যগুলো বের করে আনা হচ্ছে
@@ -105,13 +159,12 @@ class Alumnidetailspage extends StatelessWidget {
     final email = alumnus['email'] ?? 'N/A';
     final phone = alumnus['Phone No.'] ?? 'N/A';
     final alternativePhone = alumnus['Alternative Phone No.'] ?? 'Not Available';
-    final presentAddress= alumnus['Present Address in Detail'] ?? 'Not Available';
-    // final currentJob= alumnus['Current Job in Detail'] ?? 'N/A';
-    // final prevJob= alumnus['Current Job in Detail']?? 'N/A';
+    final presentAddress = alumnus['Present Address in Detail'] ?? 'Not Available';
     final college = alumnus['College'] ?? 'N/A';
     final daysInTableegh = alumnus['Days in Tableegh'] ?? 'N/A';
-    final homeDistrict= alumnus['Home District'] ?? 'N/A';
-    final bloodGroup= alumnus['Blood Group'] ?? 'N/A';
+    final homeDistrict = alumnus['Home District'] ?? 'N/A';
+    final bloodGroup = alumnus['Blood Group'] ?? 'N/A';
+
     final List<dynamic> careerHistory = alumnus['career_history'] ?? [];
 
     careerHistory.sort((a, b) {
@@ -130,13 +183,12 @@ class Alumnidetailspage extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 1,
       ),
-      backgroundColor: Colors.white, // الخلفية রঙ সাদা করা হয়েছে
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              // ===== উপরের প্রোফাইল সেকশন =====
               CircleAvatar(
                 radius: 40,
                 backgroundColor: Colors.teal,
@@ -148,7 +200,10 @@ class Alumnidetailspage extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 name.toUpperCase(),
-                style: GoogleFonts.ubuntu(fontSize: 22, fontWeight: FontWeight.bold),
+                style: GoogleFonts.ubuntu(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
@@ -156,40 +211,73 @@ class Alumnidetailspage extends StatelessWidget {
                 style: TextStyle(fontSize: 16, color: Colors.grey[700]),
               ),
               const SizedBox(height: 24),
-
-              // ===== বিস্তারিত তথ্যের কার্ড =====
               Card(
                 color: Colors.white,
                 surfaceTintColor: Colors.white,
                 elevation: 2,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      _buildInfoRow(icon: Icons.email_outlined, title: "Email", value: email),
+                      // ===== onTap ফাংশনগুলো এখানে যোগ করা হয়েছে =====
+                      _buildInfoRow(
+                        icon: Icons.email_outlined,
+                        title: "Email",
+                        value: email,
+                        onTap: () => _launchEmail(email, context),
+                      ),
                       const Divider(),
-                      _buildInfoRow(icon: Icons.phone_outlined, title: "Phone", value: phone),
+                      _buildInfoRow(
+                        icon: Icons.phone_outlined,
+                        title: "Phone",
+                        value: phone,
+                        onTap: () => _launchPhone(phone, context),
+                      ),
                       const Divider(),
-                      _buildInfoRow(icon: Icons.phone_android_outlined, title: "Alternative Phone", value: alternativePhone),
+                      _buildInfoRow(
+                        icon: Icons.phone_android_outlined,
+                        title: "Alternative Phone",
+                        value: alternativePhone,
+                        onTap: () => _launchPhone(alternativePhone, context),
+                      ),
                       const Divider(),
-                      _buildInfoRow(icon: Icons.location_on_outlined, title: "Present Address", value: presentAddress),
+                      _buildInfoRow(
+                        icon: Icons.location_on_outlined,
+                        title: "Present Address",
+                        value: presentAddress,
+                      ),
                       const Divider(),
-                      _buildInfoRow(icon: Icons.school_rounded, title: "College", value: college),
+                      _buildInfoRow(
+                        icon: Icons.school_rounded,
+                        title: "College",
+                        value: college,
+                      ),
                       const Divider(),
-                      _buildInfoRow(icon: Icons.shield_moon_rounded, title: "Days in Tableegh", value: daysInTableegh),
+                      _buildInfoRow(
+                        icon: Icons.shield_moon_rounded,
+                        title: "Days in Tableegh",
+                        value: daysInTableegh,
+                      ),
                       const Divider(),
-                      _buildInfoRow(icon: Icons.home_rounded, title: "Home District", value: homeDistrict),
+                      _buildInfoRow(
+                        icon: Icons.home_rounded,
+                        title: "Home District",
+                        value: homeDistrict,
+                      ),
                       const Divider(),
-                      _buildInfoRow(icon: Icons.bloodtype, title: "Blood Group", value: bloodGroup)
+                      _buildInfoRow(
+                        icon: Icons.bloodtype,
+                        title: "Blood Group",
+                        value: bloodGroup,
+                      ),
                     ],
                   ),
                 ),
               ),
-
               const SizedBox(height: 24),
-
-              // ===== Career সেকশন (যদি career history থাকে) =====
               if (careerHistory.isNotEmpty)
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,14 +288,16 @@ class Alumnidetailspage extends StatelessWidget {
                         SizedBox(width: 8),
                         Text(
                           'Career History',
-                          style: GoogleFonts.ubuntu(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: GoogleFonts.ubuntu(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 20),
-                    // টাইমলাইনটি এখানে কার্ড ছাড়া দেখানো হচ্ছে
                     ListView.builder(
-                      padding: const EdgeInsets.only(left: 4), // বামে সামান্য জায়গা
+                      padding: const EdgeInsets.only(left: 4),
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: careerHistory.length,
