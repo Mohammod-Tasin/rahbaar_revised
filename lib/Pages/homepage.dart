@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rahbar_revised/Data/card_data.dart';
 import 'package:rahbar_revised/Pages/allAlumniPage.dart';
+import 'package:rahbar_revised/Pages/contactWithDeveloperPage.dart';
 import 'package:rahbar_revised/Pages/currentStudentPage.dart';
-import '../Data/card_data.dart';
-import 'contactWithDeveloperPage.dart';
-
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -20,7 +19,6 @@ class _HomepageState extends State<Homepage> {
   @override
   void initState() {
     super.initState();
-    // TODO: implement initState
     _searchFocusNode.addListener(() {
       setState(() {
         _isSearchFocused = _searchFocusNode.hasFocus;
@@ -30,10 +28,69 @@ class _HomepageState extends State<Homepage> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _searchController.dispose();
     _searchFocusNode.dispose();
     super.dispose();
+  }
+
+  // একটি helper widget যা প্রতিটি কার্ড তৈরি করবে, কোড পুনরাবৃত্তি এড়ানোর জন্য
+  Widget _buildClickableCard(CardItem item) {
+    return Card(
+      elevation: 4,
+      color: Colors.white,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: InkWell(
+        onTap: () {
+          if (item.title == "Alumni page") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Allalumnipage()),
+            );
+          } else if (item.title == "Current Student Page") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Currentstudentpage()),
+            );
+          } else if (item.title == "Contact with developer") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Contactwithdeveloperpage()),
+            );
+          }
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(item.icon, size: 40, color: item.color),
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(
+                item.title,
+                textAlign: TextAlign.center,
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(
+                item.subtitle,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -45,169 +102,111 @@ class _HomepageState extends State<Homepage> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.beach_access_rounded),
+            const Icon(Icons.hub_outlined),
+            const SizedBox(width: 8),
             Text("Rahbaar", style: GoogleFonts.ubuntu()),
           ],
         ),
         centerTitle: true,
       ),
       drawer: Drawer(
-        child: Container(
-          color: const Color.fromARGB(255, 255, 255, 255),
-          child: ListView(
-            children: [
-              DrawerHeader(
-                child: Center(
-                  child: Text("R A H B A A R", style: TextStyle(fontSize: 35)),
-                ),
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              child: Center(
+                child: Text("R A H B A A R", style: TextStyle(fontSize: 35)),
               ),
-
-              ListTile(
-                leading: Icon(Icons.school_rounded),
-                title: Row(
-                  children: [
-                    Text("Alumni", style: GoogleFonts.ubuntu(fontSize: 25)),
-                  ],
-                ),
-                onTap: () {
-                  // First, close the drawer
-                  Navigator.pop(context);
-                  // Then, navigate to the CurrentStudentPage
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const Allalumnipage(),
-                    ),
-                  );
-                },
-                //navigator of this current context. push the command that will take us to a different page
-              ),
-
-              ListTile(
-                leading: Icon(Icons.people_rounded),
-                title: Text("Current Students", style: TextStyle(fontSize: 20)),
-                onTap: () {
-                  // First, close the drawer
-                  Navigator.pop(context);
-                  // Then, navigate to the CurrentStudentPage
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const Currentstudentpage(),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.school_rounded),
+              title: Text("Alumni", style: GoogleFonts.ubuntu(fontSize: 25)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Allalumnipage()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.people_rounded),
+              title: const Text("Current Students", style: TextStyle(fontSize: 20)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Currentstudentpage()),
+                );
+              },
+            ),
+          ],
         ),
       ),
       body: Column(
         children: [
+          // SearchBar (অপরিবর্তিত)
           Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 16.0, 12.0, 12.0),
+            padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 12.0),
             child: SearchBar(
               controller: _searchController,
               focusNode: _searchFocusNode,
               hintText: "Search alumni, students ...",
               leading: const Icon(Icons.search),
-              elevation: WidgetStateProperty.all(13),
-              backgroundColor: MaterialStateProperty.all(
-                _isSearchFocused ? Colors.white : Colors.white60,
-              ),
+              elevation: WidgetStateProperty.all(2),
+              shadowColor: WidgetStateProperty.all(Colors.black26),
+              backgroundColor: MaterialStateProperty.all(Colors.white),
               shape: WidgetStateProperty.all(
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               padding: WidgetStateProperty.all(
-                EdgeInsets.symmetric(horizontal: 16),
-              ), // padding inside the search bar
+                const EdgeInsets.symmetric(horizontal: 16),
+              ),
             ),
           ),
 
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
-            child: Column(children: [Row(children: [])]),
-          ),
-
+          // ===== রেসপন্সিভ লেআউটটি এখানে শুরু =====
           Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(10.0),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                mainAxisSpacing: 10.0,
-                crossAxisSpacing: 10.0,
-                childAspectRatio: 3 / 2,
-              ),
-
-              itemCount: cardItems.length,
-              // The itemBuilder function is called for each item in the grid
-              itemBuilder: (context, index) {
-                // HERE IT IS!
-                // 'item' is created to hold one object from the cardItems list.
-                final item = cardItems[index];
-
-                // Now we use the 'item' to build the Card widget
-                return InkWell(
-                  onTap: () {
-                    if (item.title == "Alumni page") {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Allalumnipage(),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                // আমরা স্ক্রিনের প্রস্থ (width) চেক করছি
+                if (constraints.maxWidth < 600) {
+                  // --- মোবাইল ডিজাইন (প্রস্থ 600 এর কম হলে) ---
+                  return ListView.builder(
+                    padding: const EdgeInsets.all(16.0),
+                    itemCount: cardItems.length,
+                    itemBuilder: (context, index) {
+                      final item = cardItems[index];
+                      // প্রতিটি কার্ডের জন্য একটি নির্দিষ্ট উচ্চতা দেওয়া হয়েছে
+                      return SizedBox(
+                        height: 160,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 16.0),
+                          child: _buildClickableCard(item),
                         ),
                       );
-                    } else if (item.title == "Current Student Page") {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Currentstudentpage(),
-                        ),
-                      );
-                    } else if (item.title == "Contact with developer") {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Contactwithdeveloperpage(),
-                        ),
-                      );
-                    }
-                    // আপনি চাইলে অন্যান্য কার্ডের জন্যও একই রকম ভাবে পেজ যোগ করতে পারেন
-                  },
-                  child: Card(
-                    semanticContainer: true,
-                    borderOnForeground: true,
-                    elevation: 10,
-                    color: Colors.white,
-                    child: InkWell(
-                      onTap: () {
-                        print('${item.title} tapped!');
-                      },
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(
-                            item.icon, // Using item's data
-                            size: 40,
-                            color: item.color, // Using item's data
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            item.title, // Using item's data
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            item.subtitle, // Using item's data
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ],
+                    },
+                  );
+                } else {
+                  // --- ট্যাবলেট ও ল্যাপটপ ডিজাইন (প্রস্থ 600 বা তার বেশি হলে) ---
+                  return SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Wrap(
+                        alignment: WrapAlignment.center, // কার্ডগুলোকে মাঝে আনে
+                        spacing: 16.0,
+                        runSpacing: 16.0,
+                        children: cardItems.map((item) {
+                          return SizedBox(
+                            width: 280,
+                            height: 180,
+                            child: _buildClickableCard(item),
+                          );
+                        }).toList(),
                       ),
                     ),
-                  ),
-                );
+                  );
+                }
               },
             ),
           ),
