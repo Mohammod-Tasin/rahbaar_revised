@@ -62,7 +62,7 @@ class Contactwithdeveloperpage extends StatelessWidget {
 
               // ===== ডেভেলপারের নাম ও পরিচিতি =====
               Text(
-                "Your Name", // <-- আপনার নাম এখানে লিখুন
+                "Anonymous", // <-- আপনার নাম এখানে লিখুন
                 style: GoogleFonts.ubuntu(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -70,7 +70,7 @@ class Contactwithdeveloperpage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               const Text(
-                "Flutter App Developer", // <-- আপনার পদবী বা পরিচিতি
+                "Slave of Almighty", // <-- আপনার পদবী বা পরিচিতি
                 style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
 
@@ -91,22 +91,22 @@ class Contactwithdeveloperpage extends StatelessWidget {
                     _buildContactTile(
                       icon: Icons.email_outlined,
                       title: "Email",
-                      subtitle: "your.email@gmail.com", // <-- আপনার ইমেইল
+                      subtitle: "anonymous32063047@gmail.com", // <-- আপনার ইমেইল
                       onTap: () => _launchURL(
-                        'mailto:your.email@gmail.com?subject=Suggestion for Rahbaar App', // <-- আপনার ইমেইল
+                        'mailto:anonymous32063047@gmail.com?subject=Suggestions and queries about Rahbaar App', // <-- আপনার ইমেইল
                         context,
                       ),
                     ),
-                    const Divider(height: 1),
-                    _buildContactTile(
-                      icon: Icons.link,
-                      title: "LinkedIn",
-                      subtitle: "linkedin.com/in/your-profile", // <-- আপনার লিংকডইন প্রোফাইল
-                      onTap: () => _launchURL(
-                        'https://www.linkedin.com/in/your-profile/', // <-- আপনার লিংকডইন প্রোফাইল
-                        context,
-                      ),
-                    ),
+                    // const Divider(height: 1),
+                    // _buildContactTile(
+                    //   icon: Icons.link,
+                    //   title: "LinkedIn",
+                    //   subtitle: "linkedin.com/in/your-profile", // <-- আপনার লিংকডইন প্রোফাইল
+                    //   onTap: () => _launchURL(
+                    //     'https://www.linkedin.com/in/your-profile/', // <-- আপনার লিংকডইন প্রোফাইল
+                    //     context,
+                    //   ),
+                    // ),
                     const Divider(height: 1),
                     _buildContactTile(
                       icon: Icons.code,
