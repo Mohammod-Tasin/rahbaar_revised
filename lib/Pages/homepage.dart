@@ -5,7 +5,7 @@ import 'package:rahbar_revised/Pages/allAlumniPage.dart';
 import 'package:rahbar_revised/Pages/contactWithDeveloperPage.dart';
 import 'package:rahbar_revised/Pages/currentStudentPage.dart';
 
-// ===== আপডেট কার্যকারিতার জন্য প্রয়োজনীয় ইম্পোর্ট =====
+// ===== আপডেট কার্যকারিতার জন্য প্রয়োজনীয় ইম্পোর্ট =====
 import 'package:flutter/foundation.dart' show kIsWeb; // Web প্ল্যাটফর্ম চেক করার জন্য
 import 'dart:io' show Platform; // Android ও Windows প্ল্যাটফর্ম চেক করার জন্য
 import 'dart:convert';
@@ -33,7 +33,7 @@ class _HomepageState extends State<Homepage> {
         _isSearchFocused = _searchFocusNode.hasFocus;
       });
     });
-    // ===== অ্যাপ চালু হওয়ার সময় আপডেট চেক করার জন্য ফাংশন কল =====
+    // ===== অ্যাপ চালু হওয়ার সময় আপডেট চেক করার জন্য ফাংশন কল =====
     _checkForUpdate();
   }
 
@@ -44,21 +44,28 @@ class _HomepageState extends State<Homepage> {
     super.dispose();
   }
 
-  // ===== ইন-অ্যাপ আপডেট কার্যকারিতার জন্য নতুন ফাংশনগুলো =====
+  // ===== ইন-অ্যাপ আপডেট কার্যকারিতার জন্য ফাংশনগুলো =====
 
   Future<void> _checkForUpdate() async {
-    // Web প্ল্যাটফর্মের জন্য আপডেট চেক করার প্রয়োজন নেই
     if (kIsWeb) return;
 
     try {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       String currentVersion = packageInfo.version;
 
-      // অনুগ্রহ করে নিচের লিংকে আপনার সঠিক GitHub ইউজারনেম ও রিপোজিটরির নাম দিন
-      final response = await http.get(Uri.parse(
-          'https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO_NAME/main/update.json'));
+      // ===== পরিবর্তন ১: GitHub URL টি এখানে ঠিক করা হয়েছে =====
+      final url = Uri.parse(
+          'https://raw.githubusercontent.com/Mohammod-Tasin/rahbaar_revised/main/update.json');
 
+      print('Checking for updates from: $url'); // <-- ডিবাগ করার জন্য যোগ করা হয়েছে
+
+      final response = await http.get(url);
+
+      // ===== পরিবর্তন ২: ডিবাগিং এর জন্য Print স্টেটমেন্ট যোগ করা হয়েছে =====
       if (response.statusCode == 200) {
+        print('Successfully fetched update.json!');
+        print('Response body: ${response.body}');
+
         final Map<String, dynamic> json = jsonDecode(response.body);
 
         String platformKey = '';
@@ -69,14 +76,38 @@ class _HomepageState extends State<Homepage> {
           String latestVersion = json[platformKey]['version'];
           String downloadUrl = json[platformKey]['url'];
 
+          print('Current App Version: $currentVersion');
+          print('Latest Version from Server: $latestVersion');
+
           if (latestVersion.compareTo(currentVersion) > 0) {
             _showUpdateDialog(latestVersion, downloadUrl);
+          } else {
+            _showUpToDateSnackbar();
           }
         }
+      } else {
+        print('Failed to fetch update.json. Status code: ${response.statusCode}');
       }
     } catch (e) {
-      print('Failed to check for updates: $e');
+      print('An error occurred while checking for updates: $e');
     }
+  }
+
+  // ===== নতুন SnackBar দেখানোর ফাংশন =====
+  void _showUpToDateSnackbar() {
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('You are using the latest version.'),
+            backgroundColor: Colors.green[600],
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            margin: const EdgeInsets.all(10),
+          ),
+        );
+      }
+    });
   }
 
   void _showUpdateDialog(String version, String url) {
@@ -87,11 +118,11 @@ class _HomepageState extends State<Homepage> {
         String buttonText = isAndroid ? "Update Now" : "Download";
 
         return AlertDialog(
-          title: Text("New Update Available!"),
+          title: const Text("New Update Available!"),
           content: Text("A new version (v$version) is available. Would you like to get it?"),
           actions: <Widget>[
             TextButton(
-              child: Text("Later"),
+              child: const Text("Later"),
               onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
@@ -214,7 +245,7 @@ class _HomepageState extends State<Homepage> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-             DrawerHeader(
+             const DrawerHeader(
               child: Center(
                 child: Text("R A H B A A R", style: TextStyle(fontSize: 35)),
               ),
