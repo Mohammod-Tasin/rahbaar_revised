@@ -1,10 +1,10 @@
 {
   "android": {
-    "version": "v23.03.01",
+    "version": "23.03.01",
     "url": "https://github.com/Mohammod-Tasin/rahbaar_revised/releases/download/v23.03.01/app-release.apk"
   },
   "windows": {
-    "version": "v23.03.01",
+    "version": "23.03.01",
     "url": "https://github.com/Mohammod-Tasin/rahbaar_revised/releases/download/v23.03.01/Windows_Release.zip"
   }
 }
