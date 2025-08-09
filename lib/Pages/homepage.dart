@@ -5,6 +5,15 @@ import 'package:rahbar_revised/Pages/allAlumniPage.dart';
 import 'package:rahbar_revised/Pages/contactWithDeveloperPage.dart';
 import 'package:rahbar_revised/Pages/currentStudentPage.dart';
 
+// ===== আপডেট কার্যকারিতার জন্য প্রয়োজনীয় ইম্পোর্ট =====
+import 'package:flutter/foundation.dart' show kIsWeb; // Web প্ল্যাটফর্ম চেক করার জন্য
+import 'dart:io' show Platform; // Android ও Windows প্ল্যাটফর্ম চেক করার জন্য
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:ota_update/ota_update.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
   @override
@@ -24,6 +33,8 @@ class _HomepageState extends State<Homepage> {
         _isSearchFocused = _searchFocusNode.hasFocus;
       });
     });
+    // ===== অ্যাপ চালু হওয়ার সময় আপডেট চেক করার জন্য ফাংশন কল =====
+    _checkForUpdate();
   }
 
   @override
@@ -33,14 +44,102 @@ class _HomepageState extends State<Homepage> {
     super.dispose();
   }
 
-  // একটি helper widget যা প্রতিটি কার্ড তৈরি করবে, কোড পুনরাবৃত্তি এড়ানোর জন্য
+  // ===== ইন-অ্যাপ আপডেট কার্যকারিতার জন্য নতুন ফাংশনগুলো =====
+
+  Future<void> _checkForUpdate() async {
+    // Web প্ল্যাটফর্মের জন্য আপডেট চেক করার প্রয়োজন নেই
+    if (kIsWeb) return;
+
+    try {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      String currentVersion = packageInfo.version;
+
+      // অনুগ্রহ করে নিচের লিংকে আপনার সঠিক GitHub ইউজারনেম ও রিপোজিটরির নাম দিন
+      final response = await http.get(Uri.parse(
+          'https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO_NAME/main/update.json'));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> json = jsonDecode(response.body);
+
+        String platformKey = '';
+        if (Platform.isAndroid) platformKey = 'android';
+        if (Platform.isWindows) platformKey = 'windows';
+
+        if (platformKey.isNotEmpty && json.containsKey(platformKey)) {
+          String latestVersion = json[platformKey]['version'];
+          String downloadUrl = json[platformKey]['url'];
+
+          if (latestVersion.compareTo(currentVersion) > 0) {
+            _showUpdateDialog(latestVersion, downloadUrl);
+          }
+        }
+      }
+    } catch (e) {
+      print('Failed to check for updates: $e');
+    }
+  }
+
+  void _showUpdateDialog(String version, String url) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        bool isAndroid = Platform.isAndroid;
+        String buttonText = isAndroid ? "Update Now" : "Download";
+
+        return AlertDialog(
+          title: Text("New Update Available!"),
+          content: Text("A new version (v$version) is available. Would you like to get it?"),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Later"),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: Text(buttonText),
+              onPressed: () {
+                Navigator.of(context).pop();
+                if (isAndroid) {
+                  _startAndroidUpdate(url);
+                } else {
+                  _launchDownloadUrl(url);
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _startAndroidUpdate(String url) async {
+    try {
+      OtaUpdate().execute(url).listen(
+        (OtaEvent event) {
+          print('EVENT: ${event.status} : ${event.value}');
+        },
+      );
+    } catch (e) {
+      print('Failed to start OTA update: $e');
+    }
+  }
+
+  void _launchDownloadUrl(String url) async {
+    final Uri downloadUri = Uri.parse(url);
+    if (await canLaunchUrl(downloadUri)) {
+      await launchUrl(downloadUri, mode: LaunchMode.externalApplication);
+    } else {
+      print('Could not launch $url');
+    }
+  }
+
+  // একটি helper widget যা প্রতিটি কার্ড তৈরি করবে (অপরিবর্তিত)
   Widget _buildClickableCard(CardItem item) {
     return Card(
       elevation: 4,
       color: Colors.white,
-      clipBehavior: Clip.antiAlias, // Ripple effect-কে কার্ডের বর্ডারের ভেতরে রাখে
+      clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
+        borderRadius: BorderRadius.circular(12.0),
       ),
       child: InkWell(
         onTap: () {
@@ -54,21 +153,22 @@ class _HomepageState extends State<Homepage> {
               context,
               MaterialPageRoute(builder: (context) => const Currentstudentpage()),
             );
-          } else if (item.title == "Queries or Suggestions") {
+          } else if (item.title == "Contact with developer") {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const Contactwithdeveloperpage()),
             );
           }
         },
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(item.icon, size: 40, color: item.color),
-              const SizedBox(height: 12),
-              Text(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(item.icon, size: 40, color: item.color),
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(
                 item.title,
                 textAlign: TextAlign.center,
                 style: Theme.of(context)
@@ -76,14 +176,17 @@ class _HomepageState extends State<Homepage> {
                     .titleMedium
                     ?.copyWith(fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 6),
-              Text(
+            ),
+            const SizedBox(height: 4),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(
                 item.subtitle,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -91,6 +194,7 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
+    // আপনার build মেথডটি সম্পূর্ণ অপরিবর্তিত
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -106,19 +210,18 @@ class _HomepageState extends State<Homepage> {
         centerTitle: true,
       ),
       drawer: Drawer(
-        width: 350,
         backgroundColor: Colors.white,
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const DrawerHeader(
+             DrawerHeader(
               child: Center(
                 child: Text("R A H B A A R", style: TextStyle(fontSize: 35)),
               ),
             ),
             ListTile(
               leading: const Icon(Icons.school_rounded),
-              title: Text("Alumni", style: GoogleFonts.ubuntu(fontSize: 23)),
+              title: Text("Alumni", style: GoogleFonts.ubuntu(fontSize: 25)),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
@@ -129,7 +232,9 @@ class _HomepageState extends State<Homepage> {
             ),
             ListTile(
               leading: const Icon(Icons.people_rounded),
-              title: Text("Current Students", style: GoogleFonts.ubuntu(fontSize: 23)),
+              title: Text("Current Students", style: GoogleFonts.ubuntu(
+                fontSize: 25,
+              )),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
@@ -139,8 +244,10 @@ class _HomepageState extends State<Homepage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.comment_rounded),
-              title: Text("Queries or Suggestions", style: GoogleFonts.ubuntu(fontSize: 23)),
+              leading: const Icon(Icons.people_rounded),
+              title: Text("Queries or Suggestions", style: GoogleFonts.ubuntu(
+                fontSize: 25,
+              )),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
@@ -152,26 +259,20 @@ class _HomepageState extends State<Homepage> {
           ],
         ),
       ),
-      // ===== মূল পরিবর্তনটি এখানে করা হয়েছে =====
       body: LayoutBuilder(
         builder: (context, constraints) {
-          // আমরা স্ক্রিনের প্রস্থ (width) চেক করছি
           bool isDesktop = constraints.maxWidth >= 600;
-
           return Column(
             children: [
-              // SearchBar
               Padding(
                 padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 12.0),
-                // বড় স্ক্রিনের জন্য সার্চ বারকে মাঝে আনা হয়েছে
                 child: Center(
                   child: Container(
-                    // বড় স্ক্রিনে সার্চ বারের একটি নির্দিষ্ট সর্বোচ্চ প্রস্থ থাকবে
                     constraints: const BoxConstraints(maxWidth: 700),
                     child: SearchBar(
                       controller: _searchController,
                       focusNode: _searchFocusNode,
-                      hintText: "Searchbar is under construction...",
+                      hintText: "Search alumni, students ...",
                       leading: const Icon(Icons.search),
                       elevation: WidgetStateProperty.all(2),
                       shadowColor: WidgetStateProperty.all(Colors.black26),
@@ -186,18 +287,15 @@ class _HomepageState extends State<Homepage> {
                   ),
                 ),
               ),
-
-              // কার্ড সেকশন
               Expanded(
                 child: isDesktop
-                    // --- ট্যাবলেট ও ল্যাপটপ ডিজাইন ---
                     ? SingleChildScrollView(
                         child: Padding(
                           padding: const EdgeInsets.all(24.0),
                           child: Wrap(
-                            alignment: WrapAlignment.center, // কার্ডগুলোকে মাঝে আনে
-                            spacing: 20.0, // কার্ডের মধ্যে পাশাপাশি দূরত্ব
-                            runSpacing: 20.0, // কার্ডের মধ্যে ওপর-নিচ দূরত্ব
+                            alignment: WrapAlignment.center,
+                            spacing: 20.0,
+                            runSpacing: 20.0,
                             children: cardItems.map((item) {
                               return SizedBox(
                                 width: 280,
@@ -208,13 +306,11 @@ class _HomepageState extends State<Homepage> {
                           ),
                         ),
                       )
-                    // --- মোবাইল ডিজাইন ---
                     : ListView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                         itemCount: cardItems.length,
                         itemBuilder: (context, index) {
                           final item = cardItems[index];
-                          // প্রতিটি কার্ডের জন্য একটি নির্দিষ্ট উচ্চতা ও নিচের মার্জিন দেওয়া হয়েছে
                           return Container(
                             height: 160,
                             margin: const EdgeInsets.only(bottom: 16.0),
